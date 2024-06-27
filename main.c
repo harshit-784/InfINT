@@ -13,7 +13,7 @@ unsigned int decimal_precision = 3000;
 #define OUTPUT_SQRT_FILENAME "./OUTPUT_SQRT_10005.txt"
 #define OUTPUT_PI_FILENAME "./OUTPUT_PI.txt"
 
-struct BigIntStruct
+struct infINTStruct
 {
     short int sign;
     unsigned int len;
@@ -22,8 +22,8 @@ struct BigIntStruct
 
 struct FractionStruct
 {
-    struct BigIntStruct *num;
-    struct BigIntStruct *den;
+    struct infINTStruct *num;
+    struct infINTStruct *den;
 };
 
 struct ComplexStruct
@@ -32,8 +32,8 @@ struct ComplexStruct
     long long int imag;
 };
 
-typedef struct BigIntStruct *BigInt;
-typedef struct BigIntStruct BigIntObj;
+typedef struct infINTStruct *infINT;
+typedef struct infINTStruct infINTObj;
 
 typedef struct ComplexStruct *Complex;
 typedef struct ComplexStruct ComplexObj;
@@ -44,7 +44,7 @@ typedef struct FractionStruct FractionObj;
 typedef unsigned long long llu;
 typedef long long ll;
 
-BigInt FACT[MAX_FACT];
+infINT FACT[MAX_FACT];
 Fraction sqrt_10005 = NULL;
 Fraction PI;
 char *PI_str;
@@ -54,27 +54,27 @@ char *PI_str;
 int Max(int x, int y);
 int Min(int x, int y);
 
-// -------------- BigInt Functions --------------
-BigInt new_BigInt(const unsigned int length);
-void set_zero(BigInt b);
-void free_BigInt(BigInt b);
-void print_BigInt(BigInt b);
-BigInt Add(const BigInt a, const BigInt b);
-BigInt Subtract(const BigInt a, const BigInt b);
+// -------------- infINT Functions --------------
+infINT new_infINT(const unsigned int length);
+void set_zero(infINT b);
+void free_infINT(infINT b);
+void print_infINT(infINT b);
+infINT Add(const infINT a, const infINT b);
+infINT Subtract(const infINT a, const infINT b);
 void _MUL_(llu x, llu y, llu *carry, llu *result);
-BigInt Multiply(const BigInt a, const BigInt b);
-void Left_Shift(BigInt num, unsigned int shift);
-int Compare(const BigInt a, const BigInt b);
-BigInt Divide(const BigInt a, const BigInt b, BigInt *remainder);
-char *Decimal_Division(BigInt a, BigInt b);
-BigInt Remainder(BigInt a, BigInt b);
-BigInt Power(BigInt num, llu p);
-BigInt GCD(BigInt a, BigInt b);
-BigInt Factorial(llu n);
+infINT Multiply(const infINT a, const infINT b);
+void Left_Shift(infINT num, unsigned int shift);
+int Compare(const infINT a, const infINT b);
+infINT Divide(const infINT a, const infINT b, infINT *remainder);
+char *Decimal_Division(infINT a, infINT b);
+infINT Remainder(infINT a, infINT b);
+infINT Power(infINT num, llu p);
+infINT GCD(infINT a, infINT b);
+infINT Factorial(llu n);
 void precompute_factorial();
-void Increment(const BigInt a, const BigInt delta);
-void increase_size(BigInt b, const unsigned int delta_len);
-void remove_preceding_zeroes(BigInt a);
+void Increment(const infINT a, const infINT delta);
+void increase_size(infINT b, const unsigned int delta_len);
+void remove_preceding_zeroes(infINT a);
 int isPrime(int n);
 int gcd(int a, int b);
 
@@ -104,8 +104,8 @@ void reciprocal_Fraction(Fraction a);
 void free_Fraction(Fraction a);
 void cancel_zeroes(Fraction a);
 
-// Calculate the Square Root of a BigInt Using Newton Rapson Method
-Fraction Square_Root(BigInt k, int n);
+// Calculate the Square Root of a infINT Using Newton Rapson Method
+Fraction Square_Root(infINT k, int n);
 
 // Computes Value of PI Using Chudnovsky Algorithm
 void PI_Chudnovsky(int n);
@@ -120,11 +120,11 @@ int Min(int x, int y)
     return x < y ? x : y;
 }
 
-// -------------- BigInt Functions --------------
+// -------------- infINT Functions --------------
 
-BigInt new_BigInt(const unsigned int length)
+infINT new_infINT(const unsigned int length)
 {
-    BigInt b = (BigInt)malloc(sizeof(BigIntObj));
+    infINT b = (infINT)malloc(sizeof(infINTObj));
     if (b == NULL)
     {
         printf("Fatal Error : Memory Allocation Failed..!");
@@ -141,19 +141,19 @@ BigInt new_BigInt(const unsigned int length)
     return b;
 }
 
-void set_zero(BigInt b)
+void set_zero(infINT b)
 {
     for (unsigned int i = 0; i < b->len; i++)
         b->d[i] = 0;
 }
 
-void free_BigInt(BigInt b)
+void free_infINT(infINT b)
 {
     free(b->d);
     free(b);
 }
 
-void print_BigInt(BigInt b)
+void print_infINT(infINT b)
 {
     printf("%c", b->sign == 1 ? '+' : '-');
 
@@ -169,7 +169,7 @@ void print_BigInt(BigInt b)
     printf("\n");
 }
 
-BigInt input_BigInt() // Function to Take Input From User as String
+infINT input_infINT() // Function to Take Input From User as String
 {
     char *arr;
     arr = (char *)malloc(2 * sizeof(char));
@@ -215,7 +215,7 @@ BigInt input_BigInt() // Function to Take Input From User as String
     {
         lenreq++;
     }
-    BigInt x = new_BigInt(lenreq);
+    infINT x = new_infINT(lenreq);
     set_zero(x);
     int j = 0;
     while (count != 0)
@@ -248,7 +248,7 @@ BigInt input_BigInt() // Function to Take Input From User as String
     return x;
 }
 
-BigInt Add(const BigInt a, const BigInt b)
+infINT Add(const infINT a, const infINT b)
 {
     if (a->sign == 1 && b->sign == 0)
     {
@@ -259,7 +259,7 @@ BigInt Add(const BigInt a, const BigInt b)
         return Subtract(b, a);
     }
 
-    BigInt c = new_BigInt(1 + Max(a->len, b->len));
+    infINT c = new_infINT(1 + Max(a->len, b->len));
     set_zero(c);
     llu carry = 0;
     for (unsigned int i = 0; i < c->len - 1; i++)
@@ -284,9 +284,9 @@ BigInt Add(const BigInt a, const BigInt b)
     return c;
 }
 
-BigInt Subtract(const BigInt a, const BigInt b)
+infINT Subtract(const infINT a, const infINT b)
 {
-    BigInt c = new_BigInt(1 + Max(a->len, b->len));
+    infINT c = new_infINT(1 + Max(a->len, b->len));
     set_zero(c);
     ll carry = 0;
     ll temp;
@@ -362,9 +362,9 @@ void _MUL_(llu x, llu y, llu *carry, llu *result)
     *result %= BASE;
 }
 
-BigInt Multiply(const BigInt a, const BigInt b)
+infINT Multiply(const infINT a, const infINT b)
 {
-    BigInt c = new_BigInt(a->len + b->len);
+    infINT c = new_infINT(a->len + b->len);
     c->sign = 1 - a->sign ^ b->sign;
     llu carry;
     set_zero(c);
@@ -386,7 +386,7 @@ BigInt Multiply(const BigInt a, const BigInt b)
     return c;
 }
 
-void Left_Shift(BigInt num, unsigned int shift)
+void Left_Shift(infINT num, unsigned int shift)
 {
     if (shift == 0)
     {
@@ -417,9 +417,9 @@ void Left_Shift(BigInt num, unsigned int shift)
     num->len += shift;
 }
 
-int Compare(const BigInt a, const BigInt b)
+int Compare(const infINT a, const infINT b)
 {
-    BigInt diff = Subtract(a, b);
+    infINT diff = Subtract(a, b);
     int flag = 0;
     for (int i = 0; i < diff->len; i++)
     {
@@ -430,30 +430,30 @@ int Compare(const BigInt a, const BigInt b)
     }
     if (diff->sign == 0) // Diff is Negative
     {
-        free_BigInt(diff);
+        free_infINT(diff);
         return -1;
     }
     else if (diff->sign == 1)
     {
-        free_BigInt(diff);
+        free_infINT(diff);
         return flag;
     }
 }
 
-BigInt Divide(const BigInt a, const BigInt b, BigInt *remainder)
+infINT Divide(const infINT a, const infINT b, infINT *remainder)
 {
-    BigInt q = new_BigInt(1);
+    infINT q = new_infINT(1);
     set_zero(q);
     q->sign = 1 - a->sign ^ b->sign;
 
-    BigInt r = new_BigInt(1);
+    infINT r = new_infINT(1);
     set_zero(r);
 
-    BigInt ten = new_BigInt(1);
+    infINT ten = new_infINT(1);
     ten->d[0] = 10;
 
-    BigInt table[11];
-    table[0] = new_BigInt(1);
+    infINT table[11];
+    table[0] = new_infINT(1);
     set_zero(table[0]);
 
     for (int i = 1; i <= 10; i++)
@@ -464,7 +464,7 @@ BigInt Divide(const BigInt a, const BigInt b, BigInt *remainder)
     llu mod;
     llu cur;
     int quo;
-    BigInt temp;
+    infINT temp;
 
     for (int i = a->len - 1; i >= 0; i--)
     {
@@ -478,7 +478,7 @@ BigInt Divide(const BigInt a, const BigInt b, BigInt *remainder)
             mod /= 10;
             temp = r;
             r = Multiply(r, ten);
-            free_BigInt(temp);
+            free_infINT(temp);
             r->d[0] += cur;
 
             // I Thought Binary Search Would Be Faster, But Ended Up Being Slower as There are Only 10 Values to Search
@@ -510,11 +510,11 @@ BigInt Divide(const BigInt a, const BigInt b, BigInt *remainder)
 
             temp = q;
             q = Multiply(q, ten);
-            free_BigInt(temp);
+            free_infINT(temp);
             q->d[0] += quo;
             temp = r;
             r = Subtract(r, table[quo]);
-            free_BigInt(temp);
+            free_infINT(temp);
         }
     }
     remove_preceding_zeroes(r);
@@ -522,19 +522,19 @@ BigInt Divide(const BigInt a, const BigInt b, BigInt *remainder)
 
     for (int i = 0; i <= 10; i++)
     {
-        free_BigInt(table[i]);
+        free_infINT(table[i]);
     }
-    free_BigInt(ten);
+    free_infINT(ten);
 
     remove_preceding_zeroes(q);
     return q;
 }
 
-char *Decimal_Division(BigInt a, BigInt b)
+char *Decimal_Division(infINT a, infINT b)
 {
-    BigInt remainder;
-    BigInt temp = new_BigInt(1);
-    BigInt quotient = Divide(a, b, &remainder);
+    infINT remainder;
+    infINT temp = new_infINT(1);
+    infINT quotient = Divide(a, b, &remainder);
     llu mod;
     llu cur;
     int flag = 1;
@@ -567,19 +567,19 @@ char *Decimal_Division(BigInt a, BigInt b)
             result[ind++] = cur + '0';
         }
     }
-    // print_BigInt(remainder);
+    // print_infINT(remainder);
 
     result[ind++] = '.';
     // return result;
-    // free_BigInt(quotient);
+    // free_infINT(quotient);
     Left_Shift(remainder, (decimal_precision + 17) / 18);
-    // BigInt ten = new_BigInt(1);
+    // infINT ten = new_infINT(1);
     // ten->d[0] = 10;
     // remainder = Multiply(remainder, Power(ten, decimal_precision));
     quotient = Divide(remainder, b, &temp);
 
     // printf("Quotient: ");
-    // print_BigInt(quotient);
+    // print_infINT(quotient);
     // printf("%d\n", quotient->len);
 
     // printf("sz = %d\n", sz);
@@ -609,46 +609,46 @@ char *Decimal_Division(BigInt a, BigInt b)
     }
     result[ind] = '\0';
 
-    // free_BigInt(remainder);
-    // free_BigInt(temp);
-    // free_BigInt(quotient);
+    // free_infINT(remainder);
+    // free_infINT(temp);
+    // free_infINT(quotient);
 
     return result;
 }
 
-BigInt Remainder(BigInt a, BigInt b)
+infINT Remainder(infINT a, infINT b)
 {
-    BigInt r;
+    infINT r;
     Divide(a, b, &r);
     return r;
 }
 
-BigInt Power(BigInt num, llu p)
+infINT Power(infINT num, llu p)
 {
-    BigInt ans = new_BigInt(1);
+    infINT ans = new_infINT(1);
     ans->d[0] = 1;
 
-    BigInt temp;
+    infINT temp;
     while (p > 0)
     {
         if (p & 1)
         {
             temp = ans;
             ans = Multiply(ans, num);
-            free_BigInt(temp);
+            free_infINT(temp);
         }
         p >>= 1;
         temp = num;
         num = Multiply(num, num);
-        free_BigInt(temp);
+        free_infINT(temp);
     }
     return ans;
 }
 
-BigInt GCD(BigInt a, BigInt b)
+infINT GCD(infINT a, infINT b)
 {
-    BigInt temp;
-    BigInt zero = new_BigInt(1);
+    infINT temp;
+    infINT zero = new_infINT(1);
     set_zero(zero);
     while (Compare(b, zero) != 0)
     {
@@ -660,15 +660,15 @@ BigInt GCD(BigInt a, BigInt b)
     return a;
 }
 
-BigInt Factorial(llu n)
+infINT Factorial(llu n)
 {
-    BigInt ans = new_BigInt(1);
+    infINT ans = new_infINT(1);
     // setzero(ans);
     ans->d[0] = 1;
     // set_zero(temp);
     for (int i = 1; i <= n; i++)
     {
-        BigInt temp = new_BigInt(1);
+        infINT temp = new_infINT(1);
         temp->d[0] = i;
         ans = Multiply(ans, temp);
     }
@@ -678,7 +678,7 @@ BigInt Factorial(llu n)
 void precompute_factorial()
 {
     FACT[0] = Factorial(1);
-    BigInt n = new_BigInt(1);
+    infINT n = new_infINT(1);
     n->d[0] = 1;
 
     for (int i = 1; i < MAX_FACT; i++)
@@ -686,10 +686,10 @@ void precompute_factorial()
         FACT[i] = Multiply(FACT[i - 1], n);
         n->d[0]++;
     }
-    free_BigInt(n);
+    free_infINT(n);
 }
 
-void Increment(const BigInt a, const BigInt delta)
+void Increment(const infINT a, const infINT delta)
 {
     if (a->len <= delta->len)
     {
@@ -710,7 +710,7 @@ void Increment(const BigInt a, const BigInt delta)
     }
 }
 
-void increase_size(BigInt b, const unsigned int delta_len)
+void increase_size(infINT b, const unsigned int delta_len)
 {
     b->d = (llu *)realloc(b->d, sizeof(llu) * (b->len + delta_len));
     b->len += delta_len;
@@ -718,7 +718,7 @@ void increase_size(BigInt b, const unsigned int delta_len)
         b->d[i] = 0;
 }
 
-void remove_preceding_zeroes(BigInt a)
+void remove_preceding_zeroes(infINT a)
 {
     while (a->len > 1 && a->d[a->len - 1] == 0)
     {
@@ -845,8 +845,8 @@ Fraction new_Fraction()
 {
     Fraction c;
     c = (Fraction)malloc(sizeof(FractionObj));
-    // c->num=new_BigInt(1);
-    // c->den=new_BigInt(1);
+    // c->num=new_infINT(1);
+    // c->den=new_infINT(1);
     return c;
 }
 
@@ -854,9 +854,9 @@ Fraction input_Fraction()
 {
     Fraction c;
     printf("Enter Numerator : ");
-    BigInt a = input_BigInt();
+    infINT a = input_infINT();
     printf("Enter Denominator : ");
-    BigInt b = input_BigInt();
+    infINT b = input_infINT();
 
     c = (Fraction)malloc(sizeof(FractionObj));
 
@@ -869,20 +869,20 @@ Fraction input_Fraction()
 void print_Fraction(Fraction a)
 {
     printf("Numerator :  ");
-    print_BigInt(a->num);
+    print_infINT(a->num);
     printf("Denominator : ");
-    print_BigInt(a->den);
+    print_infINT(a->den);
 }
 
 void reduce_Fraction(Fraction a)
 {
-    BigInt g = GCD(a->num, a->den);
+    infINT g = GCD(a->num, a->den);
     remove_preceding_zeroes(g);
     if (g->d[0] == 1)
     {
         return;
     }
-    BigInt rem;
+    infINT rem;
     a->num = Divide(a->num, g, &rem);
     a->den = Divide(a->den, g, &rem);
 }
@@ -893,20 +893,20 @@ Fraction add_Fraction(Fraction a, Fraction b)
     c->num = Add(Multiply(a->num, b->den), Multiply(a->den, b->num));
     c->den = Multiply(a->den, b->den);
 
-    // BigInt rem;
-    // BigInt g = GCD(a->den, b->den);
-    // BigInt a1 = Multiply(a->num, g);
-    // BigInt b1 = Multiply(b->num, g);
+    // infINT rem;
+    // infINT g = GCD(a->den, b->den);
+    // infINT a1 = Multiply(a->num, g);
+    // infINT b1 = Multiply(b->num, g);
     // c->num = Add(a1, b1);
 
-    // BigInt d = Divide(a->den, g, &rem);
+    // infINT d = Divide(a->den, g, &rem);
     // c->den = Multiply(b->den, d);
 
-    // free_BigInt(a1);
-    // free_BigInt(b1);
-    // free_BigInt(d);
-    // free_BigInt(g);
-    // free_BigInt(rem);
+    // free_infINT(a1);
+    // free_infINT(b1);
+    // free_infINT(d);
+    // free_infINT(g);
+    // free_infINT(rem);
 
     // reduce_Fraction(c);
 
@@ -919,20 +919,20 @@ Fraction subtract_Fraction(Fraction a, Fraction b)
     c->num = Subtract(Multiply(a->num, b->den), Multiply(a->den, b->num));
     c->den = Multiply(a->den, b->den);
 
-    // BigInt rem;
-    // BigInt g = GCD(a->den, b->den);
-    // BigInt a1 = Multiply(a->num, g);
-    // BigInt b1 = Multiply(b->num, g);
+    // infINT rem;
+    // infINT g = GCD(a->den, b->den);
+    // infINT a1 = Multiply(a->num, g);
+    // infINT b1 = Multiply(b->num, g);
     // c->num = Subtract(a1, b1);
 
-    // BigInt d = Divide(a->den, g, &rem);
+    // infINT d = Divide(a->den, g, &rem);
     // c->den = Multiply(b->den, d);
 
-    // free_BigInt(a1);
-    // free_BigInt(b1);
-    // free_BigInt(d);
-    // free_BigInt(g);
-    // free_BigInt(rem);
+    // free_infINT(a1);
+    // free_infINT(b1);
+    // free_infINT(d);
+    // free_infINT(g);
+    // free_infINT(rem);
 
     // reduce_Fraction(c);
 
@@ -963,15 +963,15 @@ Fraction divide_Fraction(Fraction a, Fraction b)
 
 void reciprocal_Fraction(Fraction a)
 {
-    BigInt temp = a->num;
+    infINT temp = a->num;
     a->num = a->den;
     a->den = temp;
 }
 
 void free_Fraction(Fraction a)
 {
-    free_BigInt(a->num);
-    free_BigInt(a->den);
+    free_infINT(a->num);
+    free_infINT(a->den);
     free(a);
 }
 
@@ -995,29 +995,29 @@ void cancel_zeroes(Fraction a)
     a->den->len -= cnt;
 }
 
-Fraction Square_Root(BigInt k, int n)
+Fraction Square_Root(infINT k, int n)
 {
-    // Calculating the Square Root of a BigInt Using Newton Rapson Method
+    // Calculating the Square Root of a infINT Using Newton Rapson Method
 
     Fraction x = new_Fraction();
-    // free_BigInt(x->num);
+    // free_infINT(x->num);
     int flag = 0;
 
     if (k->len == 1 && k->d[0] == 10005)
     {
         flag = 1;
-        // x->num = new_BigInt(1);
+        // x->num = new_infINT(1);
         // x->num->d[0] = 2050048640064001ULL;
-        // x->den = new_BigInt(1);
+        // x->den = new_infINT(1);
         // x->den->d[0] = 20495363200160ULL;
 
-        x->num = new_BigInt(4);
+        x->num = new_infINT(4);
         x->num->d[0] = 38194350081024001ULL;
         x->num->d[1] = 947199942084943826ULL;
         x->num->d[2] = 764652037898659122ULL;
         x->num->d[3] = 141301459ULL;
 
-        x->den = new_BigInt(4);
+        x->den = new_infINT(4);
         x->den->d[0] = 118368174297600640ULL;
         x->den->d[1] = 1550394278198635ULL;
         x->den->d[2] = 476412055532869542ULL;
@@ -1025,21 +1025,21 @@ Fraction Square_Root(BigInt k, int n)
     }
     else
     {
-        x->num = new_BigInt(1);
+        x->num = new_infINT(1);
         x->num->d[0] = 2;
-        x->den = new_BigInt(1);
+        x->den = new_infINT(1);
         x->den->d[0] = 1;
     }
 
     Fraction temp, temp1, f, df;
     Fraction two = new_Fraction();
-    two->num = new_BigInt(1);
-    two->den = new_BigInt(1);
+    two->num = new_infINT(1);
+    two->den = new_infINT(1);
     two->num->d[0] = 2;
     two->den->d[0] = 1;
 
     Fraction nn = new_Fraction();
-    nn->den = new_BigInt(1);
+    nn->den = new_infINT(1);
     nn->num = k;
     nn->den->d[0] = 1;
 
@@ -1081,16 +1081,16 @@ void PI_Chudnovsky(int n)
 
     ll k = -6;
 
-    BigInt c = new_BigInt(1);
-    BigInt p = new_BigInt(1);
-    BigInt q = new_BigInt(1);
-    BigInt L = new_BigInt(1);
-    BigInt dL = new_BigInt(1);
-    BigInt X = new_BigInt(1);
-    BigInt dX = new_BigInt(1);
+    infINT c = new_infINT(1);
+    infINT p = new_infINT(1);
+    infINT q = new_infINT(1);
+    infINT L = new_infINT(1);
+    infINT dL = new_infINT(1);
+    infINT X = new_infINT(1);
+    infINT dX = new_infINT(1);
     Fraction M = new_Fraction();
-    M->num = new_BigInt(1);
-    M->den = new_BigInt(1);
+    M->num = new_infINT(1);
+    M->den = new_infINT(1);
 
     c->d[0] = 426880;
     L->d[0] = 13591409;
@@ -1104,10 +1104,10 @@ void PI_Chudnovsky(int n)
     Fraction T = new_Fraction();
     Fraction SUM0 = new_Fraction();
     Fraction SUM1 = new_Fraction();
-    SUM0->num = new_BigInt(1);
-    SUM0->den = new_BigInt(1);
-    SUM1->num = new_BigInt(1);
-    SUM1->den = new_BigInt(1);
+    SUM0->num = new_infINT(1);
+    SUM0->den = new_infINT(1);
+    SUM1->num = new_infINT(1);
+    SUM1->den = new_infINT(1);
 
     T->num = L;
     T->den = X;
@@ -1121,7 +1121,7 @@ void PI_Chudnovsky(int n)
     {
         printf("Chudnovsky Formula Requires Square Root of 10005 to be Calculated First..!\n");
         printf("Computing SQRT(10005)...\n");
-        BigInt _10005 = new_BigInt(1);
+        infINT _10005 = new_infINT(1);
         _10005->d[0] = 10005;
         sqrt_10005 = Square_Root(_10005, 4);
         printf("SQRT(10005) Computed..!\n");
@@ -1261,13 +1261,13 @@ prompt:
         case 1:
         {
             printf("Enter the First Number : ");
-            BigInt a = input_BigInt();
+            infINT a = input_infINT();
             printf("Enter the Second Number : ");
-            BigInt b = input_BigInt();
+            infINT b = input_infINT();
             t = clock();
-            BigInt c = Add(a, b);
+            infINT c = Add(a, b);
             printf("The Sum is : ");
-            print_BigInt(c);
+            print_infINT(c);
             t = clock() - t;
             time = ((double)t)/CLOCKS_PER_SEC;
             printf("Execution Time : %g seconds..!\n", time);
@@ -1278,13 +1278,13 @@ prompt:
         case 2:
         {
             printf("Enter the First Number : ");
-            BigInt a = input_BigInt();
+            infINT a = input_infINT();
             printf("Enter the Second Number : ");
-            BigInt b = input_BigInt();
+            infINT b = input_infINT();
             t = clock();
-            BigInt c = Subtract(a, b);
+            infINT c = Subtract(a, b);
             printf("The Difference is : ");
-            print_BigInt(c);
+            print_infINT(c);
             t = clock() - t;
             time = ((double)t)/CLOCKS_PER_SEC;
             printf("Execution Time : %g seconds..!\n", time);
@@ -1295,15 +1295,15 @@ prompt:
         case 3:
         {
             printf("Enter the First Number : ");
-            BigInt a = input_BigInt();
+            infINT a = input_infINT();
             printf("Enter the Second Number : ");
-            BigInt b = input_BigInt();
+            infINT b = input_infINT();
             t = clock();
-            BigInt c = Multiply(a, b);
+            infINT c = Multiply(a, b);
             t = clock() - t;
             time = ((double)t)/CLOCKS_PER_SEC;
             printf("The Product is : ");
-            print_BigInt(c);
+            print_infINT(c);
             printf("Execution Time : %g seconds..!\n", time);
             printf("\n");
             break;
@@ -1312,18 +1312,18 @@ prompt:
         case 4:
         {
             printf("Enter the Dividend : ");
-            BigInt a = input_BigInt();
+            infINT a = input_infINT();
             printf("Enter the Divisor : ");
-            BigInt b = input_BigInt();
-            BigInt rem;
+            infINT b = input_infINT();
+            infINT rem;
             t = clock();
-            BigInt c = Divide(a, b, &rem);
+            infINT c = Divide(a, b, &rem);
             t = clock() - t;
             time = ((double)t)/CLOCKS_PER_SEC;
             printf("The Quotient is : ");
-            print_BigInt(c);
+            print_infINT(c);
             printf("The Remainder is : ");
-            print_BigInt(rem);
+            print_infINT(rem);
             printf("Execution Time : %g seconds..!\n", time);
             printf("\n");
             break;
@@ -1332,9 +1332,9 @@ prompt:
         case 5:
         {
             printf("Enter the Dividend : ");
-            BigInt a = input_BigInt();
+            infINT a = input_infINT();
             printf("Enter the Divisor : ");
-            BigInt b = input_BigInt();
+            infINT b = input_infINT();
             t = clock();
             char* c = Decimal_Division(a, b);
             t = clock() - t;
@@ -1349,16 +1349,16 @@ prompt:
         case 6:
         {
             printf("Enter the Dividend : ");
-            BigInt a = input_BigInt();
+            infINT a = input_infINT();
             printf("Enter the Divisor : ");
-            BigInt b = input_BigInt();
-            BigInt rem;
+            infINT b = input_infINT();
+            infINT rem;
             t = clock();
-            BigInt c = Divide(a, b, &rem);
+            infINT c = Divide(a, b, &rem);
             t = clock() - t;
             time = ((double)t)/CLOCKS_PER_SEC;
             printf("The Remainder is : ");
-            print_BigInt(rem);
+            print_infINT(rem);
             printf("Execution Time : %g seconds..!\n", time);
             printf("\n");
             break;
@@ -1367,15 +1367,15 @@ prompt:
         case 7:
         {
             printf("Enter the First Number : ");
-            BigInt a = input_BigInt();
+            infINT a = input_infINT();
             printf("Enter the Second Number : ");
-            BigInt b = input_BigInt();
+            infINT b = input_infINT();
             t = clock();
-            BigInt c = GCD(a, b);
+            infINT c = GCD(a, b);
             t = clock() - t;
             time = ((double)t)/CLOCKS_PER_SEC;
             printf("The GCD is : ");
-            print_BigInt(c);
+            print_infINT(c);
             printf("Execution Time : %g seconds..!\n", time);
             printf("\n");
             break;
@@ -1384,16 +1384,16 @@ prompt:
         case 8:
         {
             printf("Enter the Base : ");
-            BigInt a = input_BigInt();
+            infINT a = input_infINT();
             printf("Enter the Exponent : ");
             llu b;
             scanf("%llu", &b);
             t = clock();
-            BigInt c = Power(a, b);
+            infINT c = Power(a, b);
             t = clock() - t;
             time = ((double)t)/CLOCKS_PER_SEC;
             printf("The Result is : ");
-            print_BigInt(c);
+            print_infINT(c);
             printf("Execution Time : %g seconds..!\n", time);
             printf("\n");
             break;
@@ -1405,11 +1405,11 @@ prompt:
             llu a;
             scanf("%llu", &a);
             t = clock();
-            BigInt c = Factorial(a);
+            infINT c = Factorial(a);
             t = clock() - t;
             time = ((double)t)/CLOCKS_PER_SEC;
             printf("The Factorial is : ");
-            print_BigInt(c);
+            print_infINT(c);
             printf("Execution Time : %g seconds..!\n", time);
             printf("\n");
             break;
@@ -1638,7 +1638,7 @@ prompt:
 
         case 20:
         {
-            BigInt a = new_BigInt(1);
+            infINT a = new_infINT(1);
             a->d[0] = 10005;
             int n;
             printf("Enter Number of Terms of Newton-Raphson Algorithm : ");
